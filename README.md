@@ -14,10 +14,11 @@ Use cases:
 - csv helper: provides write and read features to process our train records.
 
 domains:
-- PlainArrival: model the basic record received from the client, offering some behaviors related to its attributes
-(I think they could be separated out of the class as alternative, but I liked inside because they are coupled with
-its attributes)
-- CheckedArrival: the post processed arrival record, that is going to be manipulated.
+- PlainArrival: model the basic record received from the client, 
+- LastTrainArrival: the post processed arrival record, that is going to be manipulated.
+ offering some behaviors related to its attributes
+  (I think they could be separated out of the class as alternative, but I liked inside because they are coupled with
+  its attributes)
 
 In this case I thought It would be worth to provide a rest API because is easy to manipulate via postman 
 and extensible with any web or native front end app

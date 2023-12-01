@@ -1,45 +1,52 @@
 package com.gontreno.trenolandia.arrival_inspector.inspector;
 
-import com.gontreno.trenolandia.arrival_inspector.domain.CheckedArrival;
+import com.gontreno.trenolandia.arrival_inspector.domain.LastTrainArrival;
 import com.gontreno.trenolandia.arrival_inspector.domain.PlainArrival;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class ArrivalInspectorImpl implements ArrivalInspector{
+public class ArrivalInspectorImpl implements ArrivalInspector {
 
-    public List<CheckedArrival> filterFiveTrainsMoreDelayed(List<PlainArrival> plannedArrivals, List<PlainArrival> actualArrivals){
+    public List<LastTrainArrival> filterFiveTrainsMoreDelayed(List<PlainArrival> plannedArrivals, List<PlainArrival> actualArrivals) {
 
-        List<CheckedArrival> checkedArrivals = getDifferenceBetweenPlannedVsActualArrivals(plannedArrivals, actualArrivals);
+        List<LastTrainArrival> lastTrainArrivals = new ArrayList<>( obtainAllLastTrainsArrivals(plannedArrivals, actualArrivals) );
 
-        checkedArrivals.sort(Comparator.comparingLong(CheckedArrival::getDelay).reversed());
+        lastTrainArrivals.sort(Comparator.comparingLong(LastTrainArrival::getDelay).reversed());
 
-        return checkedArrivals.subList(0, 5);
+        return lastTrainArrivals.subList(0, Math.min(5, lastTrainArrivals.size()));
     }
 
-    public List<CheckedArrival> getDifferenceBetweenPlannedVsActualArrivals(
+    public Collection<LastTrainArrival> obtainAllLastTrainsArrivals(
             List<PlainArrival> plannedArrivals, List<PlainArrival> actualArrivals) {
 
-        List<CheckedArrival> checkedArrivals = new LinkedList<>();
+        Map<String, LastTrainArrival> lastTrainsArrivals = new HashMap<>();
 
-        for (int i = 0; i < plannedArrivals.size(); i++) {
-            PlainArrival plannedArrival = plannedArrivals.get(i);
-            PlainArrival actualArrival = actualArrivals.get(i);
+        for (PlainArrival plannedArrival : plannedArrivals) {
+            String trainNumber = plannedArrival.getTrainNumber();
 
-            checkedArrivals.add(
-                new CheckedArrival(
-                   plannedArrival.getTrainNumber(),
-                   plannedArrival.getTrainStation(),
-                   plannedArrival.formatArrivalToOffsetTime(),
-                   actualArrival.formatArrivalToOffsetTime(),
-                   plannedArrival.getDelayFromComparingActualArrival(
-                           actualArrival.getArrival()
-                   )
-                )
-            );
+            if (!lastTrainsArrivals.containsKey(trainNumber) ||
+                    plannedArrival.getArrival().isAfter(lastTrainsArrivals.get(trainNumber).getPlannedArrival())
+            ) {
+
+                PlainArrival actualArrival = actualArrivals.stream()
+                        .filter(arrival -> Objects.equals(arrival.getTrainNumber(), plannedArrival.getTrainNumber()) &&
+                                Objects.equals(arrival.getTrainStation(), plannedArrival.getTrainStation()))
+                        .findFirst().get();
+
+                LastTrainArrival lastTrainArrival = new LastTrainArrival(
+                        trainNumber,
+                        plannedArrival.getTrainStation(),
+                        plannedArrival.getArrival(),
+                        actualArrival.getArrival()
+                );
+
+                lastTrainsArrivals.put(trainNumber, lastTrainArrival);
+            }
+
         }
 
-        return checkedArrivals;
+        return lastTrainsArrivals.values();
     }
 }

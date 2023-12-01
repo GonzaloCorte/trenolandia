@@ -1,6 +1,6 @@
 package com.gontreno.trenolandia.arrival_inspector.controller;
 
-import com.gontreno.trenolandia.arrival_inspector.domain.CheckedArrival;
+import com.gontreno.trenolandia.arrival_inspector.domain.LastTrainArrival;
 import com.gontreno.trenolandia.arrival_inspector.domain.PlainArrival;
 import com.gontreno.trenolandia.arrival_inspector.inspector.ArrivalInspector;
 import com.gontreno.trenolandia.csv_helper.CsvGenerator;
@@ -36,7 +36,7 @@ public class ArrivalInspectorController {
         List<PlainArrival> plannedArrivals = CvsReader.csvToArrivals(expectedArrivalsFile);
         List<PlainArrival> actualArrivals = CvsReader.csvToArrivals(actualArrivalsFile);
 
-        List<CheckedArrival> fiveMoreDelayed = arrivalInspector.filterFiveTrainsMoreDelayed(plannedArrivals, actualArrivals);
+        List<LastTrainArrival> fiveMoreDelayed = arrivalInspector.filterFiveTrainsMoreDelayed(plannedArrivals, actualArrivals);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
