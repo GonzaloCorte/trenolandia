@@ -8,6 +8,8 @@ import java.util.List;
 
 public class CsvGenerator {
 
+    private static final String SEPARATOR = ",";
+
     private static final String CSV_HEADERS = "Numero treno,Destinazione,Ora pianificata,Ora effettiva,Ritardo";
 
     public static String generateCsv(List<LastTrainArrival> lastTrainArrivals) {
@@ -17,10 +19,10 @@ public class CsvGenerator {
 
         lastTrainArrivals.forEach(lastTrainArrival ->
                 csvContent
-                    .append(lastTrainArrival.getTrainNumber())
-                    .append(lastTrainArrival.getTrainStation())
-                    .append(zonedDateTimeToOffsetTime(lastTrainArrival.getPlannedArrival()))
-                    .append(zonedDateTimeToOffsetTime(lastTrainArrival.getActualArrival()))
+                    .append(lastTrainArrival.getTrainNumber() + SEPARATOR)
+                    .append(lastTrainArrival.getTrainStation() + SEPARATOR)
+                    .append(zonedDateTimeToOffsetTime(lastTrainArrival.getPlannedArrival()) + SEPARATOR)
+                    .append(zonedDateTimeToOffsetTime(lastTrainArrival.getActualArrival()) + SEPARATOR)
                     .append(lastTrainArrival.getDelay())
                         .append("\n")
                 );
